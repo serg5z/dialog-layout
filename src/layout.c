@@ -48,7 +48,6 @@ __layout_dialog_procedure__(HWND dialog, UINT message, WPARAM w_param, LPARAM l_
     LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
     MINMAXINFO* min_max_info = (MINMAXINFO*)l_param;
     RECT client;
-    WINDOWINFO info;
 
     if(layout != 0) {
       client.top = 0;
@@ -58,8 +57,6 @@ __layout_dialog_procedure__(HWND dialog, UINT message, WPARAM w_param, LPARAM l_
     } else {
       GetClientRect(dialog, &client);
     }
-
-    GetWindowInfo(dialog, &info);
 
     min_max_info->ptMinTrackSize.x = client.right-client.left;
     min_max_info->ptMinTrackSize.y = client.bottom-client.top;
