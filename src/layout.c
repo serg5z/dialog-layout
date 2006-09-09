@@ -188,7 +188,7 @@ attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
   WNDPROC* original_procedure = (WNDPROC*)GlobalAlloc(GPTR, sizeof(WNDPROC));
   LAYOUT* layout = create_layout(resource, dialog, layout_name);
   
-  *original_procedure = (WNDPROC)SetWindowLong(dialog, GWL_WNDPROC, (DWORD)__layout_dialog_procedure__);
+  *original_procedure = (WNDPROC)SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)__layout_dialog_procedure__);
   
   SetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM), original_procedure);
   SetProp(dialog, MAKEINTATOM(LAYOUT_ATOM), layout);
@@ -198,7 +198,7 @@ void
 detach_layout(HWND dialog) {
   WNDPROC original_procedure = *((WNDPROC*)GetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM)));
   
-  SetWindowLong(dialog, GWL_WNDPROC, (DWORD)original_procedure);
+  SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)original_procedure);
   
   RemoveProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
   RemoveProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
