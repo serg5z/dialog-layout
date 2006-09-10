@@ -1,17 +1,24 @@
-export BIN := $(shell pwd)/bin
-export BUILD := $(shell pwd)/build
-export LIB := $(shell pwd)/lib
-export INCLUDE := $(shell pwd)/include
-export CXX  := g++.exe
-export CC   := gcc.exe
-export AR := ar.exe
-export WINDRES := windres.exe
-export DLLWRAP = dllwrap.exe
-export CXXFLAGS := -ansi -pedantic -Wall -W -I$(INCLUDE)
-export CFLAGS := -ansi -pedantic -Wall -W -I$(INCLUDE)
-export LDFLAGS := -L$(LIB)
+.EXPORT_ALL_VARIABLES:
+
+ROOT ?= $(shell pwd)
+BIN ?= $(ROOT)/bin
+BUILD ?= $(ROOT)/build
+LIB ?= $(ROOT)/lib
+INCLUDE ?= -I$(ROOT)/include
+CXX ?= g++.exe
+CC ?= gcc.exe
+AR ?= ar.exe
+RC ?= windres.exe
+DLLWRAP ?= dllwrap.exe
+CXXFLAGS ?= -ansi -pedantic -Wall -W $(INCLUDE)
+CFLAGS ?= -ansi -pedantic -Wall -W $(INCLUDE)
+RCFLAGS ?= -DMING $(INCLUDE)
+LDFLAGS ?= -L$(LIB)
+ARFLAGS ?= crv
+UPDATE_VERSION ?= $(BIN)/update_version.exe
 
 all:
+	echo $(ROOT)
 	mkdir -p $(LIB)
 	$(MAKE) -C src
         
