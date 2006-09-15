@@ -85,7 +85,7 @@ layout_child(HWND control, LPARAM l_param) {
   RECT control_rect;
   int dialog_width = param->dialog_rect.right - param->dialog_rect.left;
   int dialog_height = param->dialog_rect.bottom - param->dialog_rect.top;
-  int i;
+  unsigned int i;
   
   GetWindowRect(control, &control_rect);
 
