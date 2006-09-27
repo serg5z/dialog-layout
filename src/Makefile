@@ -1,38 +1,14 @@
 PROJ = layout.lib
 !ifndef ROOT
-ROOT = ../..
-!endif
-!ifndef BUILD
-BUILD = .
-!endif
-
-# set NODEBUG _before_ win32.mak
-!ifndef DEBUG
-NODEBUG=yes 
-!endif
-
-!include <win32.mak>
-
-# any modifications to the flags should go _after_ win32.mak
-!ifdef UNICODE
-cflags = $(cflags) -DUNICODE -D_UNICODE
+ROOT = ..\..
 !endif
 
 OBJ=layout.obj
     
-cflags = $(cflags) -I..\include
+!include $(ROOT)\make\static-library.mak
 
-all: $(LIBRARY)\$(PROJ)
+# any modifications to the flags should go _after_ win32.mak
+cflags = $(cflags) -D_CRT_SECURE_NO_DEPRECATE -I..\include
+rcflags = $(rcflags) -I..\include
 
-clean:
-    del *.obj *.res $(LIBRARY)\$(PROJ)
-
-$(LIBRARY)\$(PROJ): $(OBJ)
-    $(implib) -out:$(LIBRARY)\$(PROJ) \
-    $(OBJ) 
-
-.c.obj:
-    $(cc) $(cflags) $(cvarsmt) $(cdebug) /WX $<
-    
-.cpp.obj:
-    $(cc) $(cflags) $(cvarsmt) $(cdebug) /WX $<
+#dependency information goes here
