@@ -93,7 +93,7 @@ layout_child(HWND control, LPARAM l_param) {
   
   for(i = 0; i < param->n; i++) {
     if(param->layout_table[i].id == item_id) {
-      LAYOUT_ITEM_LIST* item = (LAYOUT_ITEM_LIST*)malloc(sizeof(LAYOUT_ITEM_LIST));
+      LAYOUT_ITEM_LIST* item = (LAYOUT_ITEM_LIST*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (sizeof(LAYOUT_ITEM_LIST)));
       
       item->item.id = item_id;
       item->item.top_left.anchor = param->layout_table[i].top_left_anchor;
@@ -155,7 +155,7 @@ create_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
   layout_resource_size = SizeofResource(resource, resource_handle);
   layout_table = (LAYOUT_ITEM_RC*)LockResource(layout_table_handle);
   
-  layout = (LAYOUT*)GlobalAlloc(GPTR, sizeof(LAYOUT));
+  layout = (LAYOUT*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(LAYOUT));
   
   l_param.layout = layout;
   l_param.layout_table = layout_table;
@@ -185,7 +185,7 @@ create_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
 
 void 
 attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
-  WNDPROC* original_procedure = (WNDPROC*)GlobalAlloc(GPTR, sizeof(WNDPROC));
+  WNDPROC* original_procedure = (WNDPROC*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(WNDPROC));
   LAYOUT* layout = create_layout(resource, dialog, layout_name);
   
   *original_procedure = (WNDPROC)SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)__layout_dialog_procedure__);
@@ -196,12 +196,24 @@ attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
 
 void
 detach_layout(HWND dialog) {
-  WNDPROC original_procedure = *((WNDPROC*)GetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM)));
+  WNDPROC* original_procedure = (WNDPROC*)GetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
+  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  LAYOUT_ITEM_LIST* current;
+  LAYOUT_ITEM_LIST* next;
   
-  SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)original_procedure);
+  SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)(*original_procedure));
   
   RemoveProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
   RemoveProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  
+  HeapFree(GetProcessHeap(), 0, original_procedure);
+  current  =  (LAYOUT_ITEM_LIST*)(layout->control_layout);
+  while(current != 0) {
+    next = current->next;
+    HeapFree(GetProcessHeap(), 0, current);
+    current = next;
+  }
+  HeapFree(GetProcessHeap(), 0, layout);
 }
 
 void
