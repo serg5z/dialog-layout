@@ -1,9 +1,10 @@
-PROJ = layout.lib
+O = $(CPU)
+PROJ = $(O)\layout.lib
 !ifndef ROOT
 ROOT = ..\..
 !endif
 
-OBJ=layout.obj
+OBJ=$(O)\layout.obj
     
 !include $(ROOT)\make\static-library.mak
 
