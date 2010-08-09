@@ -8,7 +8,9 @@
 
 #ifndef __layout_h__
 #define __layout_h__
+#ifdef _MSC_VER
 #pragma warning (disable: 4163)
+#endif
 #include <windows.h>
 #include <tchar.h>
 
