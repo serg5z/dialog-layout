@@ -1,0 +1,7 @@
+# Doxygen output
+docs/doxygen/
+html/
+latex/
+
+# dev build
+build*/
