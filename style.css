@@ -53,3 +53,9 @@ body.dark, html[data-theme="dark"] {
   --accent: #7fb3fa;
   --nav-bg: #232429;
 }
+.nav-link.active {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  font-weight: bold;
+  background: rgba(0,0,0,0.03);
+}

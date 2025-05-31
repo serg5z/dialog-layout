@@ -20,3 +20,17 @@ themeToggle.addEventListener('click', () => {
   setThemeIcon(isNowDark);
   localStorage.setItem('theme', isNowDark ? 'dark' : 'light');
 });
+
+// Highlight current page in nav bar
+document.querySelectorAll('nav .nav-link').forEach(link => {
+  const linkHref = link.getAttribute('href').replace(/[#?].*$/, '');
+  // Get the current file from location.pathname
+  const currentPage = location.pathname.split('/').pop() || "index.html";
+  // If root or index.html
+  if ((linkHref === "index.html" && (currentPage === "" || currentPage === "index.html")) ||
+      (linkHref !== "" && linkHref === currentPage)) {
+    link.classList.add('active');
+  }
+});
+
+
