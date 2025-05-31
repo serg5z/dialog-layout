@@ -75,7 +75,7 @@ If installed in a custom location, set `CMAKE_PREFIX_PATH`.
 #include "layout.h"
 
 // Attach layout to dialog, for example in WM_INITDIALOG
-attach_layout(GetModuleHandle(NULL), hDlg, TEXT("ID_MAINDIALOG_LAYOUT"));
+attach_layout(GetModuleHandle(NULL), hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));
 ```
 
 * See [`include/layout.h`](include/layout.h) for full API.
