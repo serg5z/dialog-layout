@@ -21,12 +21,13 @@ jobs:
 
       - name: Generate index.html with version links
         run: |
-            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>dialog-layout Documentation</title></head><body><h1>dialog-layout Documentation</h1><ul>' > ./html/index.html
-            for dir in $(ls -d ./html/*/ | grep -vE '^\./html/(assets|css|js)/'); do
+          mkdir -p docs
+          echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>dialog-layout Documentation</title></head><body><h1>dialog-layout Documentation</h1><ul>' > docs/index.html
+          for dir in $(find docs -mindepth 1 -maxdepth 1 -type d); do
             d=$(basename "$dir")
-            echo "<li><a href=\"$d/\">$d</a></li>" >> ./html/index.html
-            done
-            echo '</ul></body></html>' >> ./html/index.html
+            echo "<li><a href=\"$d/\">$d</a></li>" >> docs/index.html
+          done
+          echo '</ul></body></html>' >> docs/index.html
 
       # Determine if this is a tag or branch build
       - name: Set destination_dir
