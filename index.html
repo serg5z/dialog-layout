@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,17 +9,14 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav>
-    <img src="assets/dialog-layout.png" alt="dialog-layout" class="logo" />
-    <a href="index.html">Home</a>
-    <a href="docs.html">Docs</a>
-    <a href="examples.html">Examples</a>
-    <a href="contribute.html">Contribute</a>
-    <a href="license.html">License</a>
-    <button id="theme-toggle" aria-label="Toggle Theme">🌓</button>
-  </nav>
-  <main>
+  {% include header.html %}
+  <main>    
     <h1>dialog-layout</h1>
+    <div class="badges">
+      <a href="https://github.com/serg5z/dialog-layout"><img src="https://img.shields.io/github/stars/serg5z/dialog-layout?style=social" alt="GitHub stars"></a>
+      <img src="https://img.shields.io/badge/license-BSD-blue" alt="BSD License">
+      <img src="https://img.shields.io/badge/version-1.0.2-blue" alt="Version 1.0.2">
+    </div>
     <p>
       <b>dialog-layout</b> is a lightweight, anchor-based runtime layout engine for Win32 dialogs.<br>
       It brings automatic resizing and repositioning of controls, using resource-defined anchor rules.<br>
@@ -44,9 +43,7 @@ target_link_libraries(your-app PRIVATE dialog-layout)
       </ul>
     </section>
   </main>
-  <footer>
-    &copy; 2003–2025 Sergey Zorin • <a href="license.html">BSD License</a>
-  </footer>
+  {% include footer.html %}
   <script src="theme.js"></script>
 </body>
 </html>

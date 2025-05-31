@@ -1,3 +1,5 @@
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,15 +9,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav>
-    <img src="assets/dialog-layout.png" alt="dialog-layout" class="logo" />
-    <a href="index.html">Home</a>
-    <a href="docs.html">Docs</a>
-    <a href="examples.html">Examples</a>
-    <a href="contribute.html">Contribute</a>
-    <a href="license.html">License</a>
-    <button id="theme-toggle" aria-label="Toggle Theme">🌓</button>
-  </nav>
+  {% include header.html %}
   <main>
     <h1>Examples</h1>
     <h2>Sample Control Anchoring</h2>
@@ -49,9 +43,7 @@ detach_layout(hDlg); // on WM_DESTROY
     <h2>Sample Application</h2>
     <a href="https://github.com/serg5z/dialog-layout/tree/master/example">Example</a>
   </main>
-  <footer>
-    &copy; 2003–2025 Sergey Zorin
-  </footer>
+  {% include footer.html %}
   <script src="theme.js"></script>
 </body>
 </html>
