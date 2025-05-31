@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documentation – dialog-layout</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <img src="assets/dialog-layout.png" alt="dialog-layout" class="logo" />
+    <a href="index.html">Home</a>
+    <a href="docs.html">Docs</a>
+    <a href="examples.html">Examples</a>
+    <a href="contribute.html">Contribute</a>
+    <a href="license.html">License</a>
+    <button id="theme-toggle" aria-label="Toggle Theme">🌓</button>
+  </nav>
+  <main>
+    <h1>Documentation</h1>
+    <h2>API Reference</h2>
+    <ul>
+      <li><a href="doxygen/latest/index.html">Latest (development)</a></li>
+    </ul>
+    <h2>Installation</h2>
+    <ol>
+      <li>Add <code>dialog-layout</code> to your project using CMake or by copying <code>layout.h</code> and <code>layout.c</code>.</li>
+      <li>Include the header: <code>#include "layout.h"</code></li>
+      <li>Compile and link with <code>layout.c</code> in your sources.</li>
+    </ol>
+    <h2>Usage</h2>
+    <ol>
+      <li>Create your Win32 dialog resource as usual in your <code>.rc</code> file.</li>
+      <li>Create a layout resource (.bin, using the documented format) and add it as an RCDATA resource.</li>
+      <li>In your dialog procedure:
+        <pre>
+attach_layout(GetModuleHandle(NULL), hDlg, _T("MY_DIALOG_LAYOUT")); // in WM_INITDIALOG 
+detach_layout(hDlg); // in WM_DESTROY
+        </pre>
+      </li>
+    </ol>
+    <h2>Layout Resource Format</h2>
+    <p>
+      Each layout item is a struct:
+      <pre>
+typedef struct {
+  DWORD id;
+  DWORD top_left_anchor;
+  DWORD bottom_right_anchor;
+} LAYOUT_ITEM_RC;
+      </pre>
+    </p>
+    <p>See <a href="examples.html">examples</a> for a generator script and sample anchor setup.</p>
+  </main>
+  <footer>
+    &copy; 2003–2025 Sergey Zorin
+  </footer>
+  <script src="theme.js"></script>
+</body>
+</html>

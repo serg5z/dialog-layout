@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Examples – dialog-layout</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav>
+    <img src="assets/dialog-layout.png" alt="dialog-layout" class="logo" />
+    <a href="index.html">Home</a>
+    <a href="docs.html">Docs</a>
+    <a href="examples.html">Examples</a>
+    <a href="contribute.html">Contribute</a>
+    <a href="license.html">License</a>
+    <button id="theme-toggle" aria-label="Toggle Theme">🌓</button>
+  </nav>
+  <main>
+    <h1>Examples</h1>
+    <h2>Sample Control Anchoring</h2>
+    <pre>
+  // Dialog layout anchors as RCDATA
+  ID_MAINDIALOG_LAYOUT RCDATA
+  BEGIN
+      IDC_EDIT_FIRSTNAME, 3L, 6L,        // ANCOR_LEFT | ANCOR_TOP, ANCOR_RIGHT | ANCOR_TOP
+      IDC_EDIT_LASTNAME,  3L, 6L,        // ANCOR_LEFT | ANCOR_TOP, ANCOR_RIGHT | ANCOR_TOP
+      IDOK,              12L, 12L,       // ANCOR_RIGHT | ANCOR_BOTTOM, ANCOR_RIGHT | ANCOR_BOTTOM
+      IDCANCEL,          12L, 12L        // ANCOR_RIGHT | ANCOR_BOTTOM, ANCOR_RIGHT | ANCOR_BOTTOM
+      IDC_RESIZE,        12L, 12L        // ANCOR_RIGHT | ANCOR_BOTTOM, ANCOR_RIGHT | ANCOR_BOTTOM
+  END
+    </pre>
+    <p>Note: control IDs should be defined with L suffix to make them the same size as DWROD type</p>
+    <pre>
+      #define IDC_EDIT_FIRSTNAME    1001L
+      #define IDC_EDIT_LASTNAME     1002L
+      #define IDC_RESIZE            1003L
+      #define IDOK                  1L
+      #define IDCANCEL              2L
+    </pre>
+    <h2>Layout Resource Generation</h2>
+    <p>Work in progress</p>
+    <h2>Dialog Integration</h2>
+    <pre>
+// In your dialog procedure
+attach_layout(hInstance, hDlg, MAKEINTRESOURCE(MY_DIALOG_LAYOUT)); // on WM_INITDIALOG
+detach_layout(hDlg); // on WM_DESTROY
+    </pre>
+    <h2>Sample Application</h2>
+    <a href="https://github.com/serg5z/dialog-layout/tree/master/example">Example</a>
+  </main>
+  <footer>
+    &copy; 2003–2025 Sergey Zorin
+  </footer>
+  <script src="theme.js"></script>
+</body>
+</html>
