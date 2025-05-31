@@ -1,0 +1,42 @@
+name: Make release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, Win32, ARM64]
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure (CMake, Visual Studio generator)
+      run: cmake -S . -B build -A ${{ matrix.arch }}
+
+    - name: Build (MSBuild)
+      run: cmake --build build --config Release
+          
+  release:
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+    
