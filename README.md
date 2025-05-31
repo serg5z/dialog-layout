@@ -170,5 +170,5 @@ Pull requests and issue reports are welcome!
 
 ## Resources
 
-* [Example resource file usage](docs/example-rc.md) *(optional, add if you create one)*
+* [Example resource file usage](docs/example-rc.md)
 * [API documentation](https://serg5z.github.io/dialog-layout/)
