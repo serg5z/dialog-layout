@@ -1,20 +1,47 @@
-name: Doxygen Docs
+name: Publish Doxygen Docs (versioned and latest)
 
 on:
   push:
     branches: [main]
+    tags:
+      - '*'       # Any tag
 
 jobs:
-  doxygen:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: Install Doxygen
-        run: sudo apt-get install doxygen graphviz
-      - name: Generate docs
+
+      - name: Install Doxygen and Graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen documentation
         run: doxygen Doxyfile
+
+      - name: Generate index.html with version links
+        run: |
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>dialog-layout Documentation</title></head><body><h1>dialog-layout Documentation</h1><ul>' > ./html/index.html
+            for dir in $(ls -d ./html/*/ | grep -vE '^\./html/(assets|css|js)/'); do
+            d=$(basename "$dir")
+            echo "<li><a href=\"$d/\">$d</a></li>" >> ./html/index.html
+            done
+            echo '</ul></body></html>' >> ./html/index.html
+
+      # Determine if this is a tag or branch build
+      - name: Set destination_dir
+        id: destdir
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "dir=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+          else
+            echo "dir=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+          destination_dir: ${{ steps.destdir.outputs.dir }}
+          keep_files: true
