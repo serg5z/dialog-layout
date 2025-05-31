@@ -82,6 +82,73 @@ attach_layout(GetModuleHandle(NULL), hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT)
 
 ---
 
+**Quick Start – dialog-layout**
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone and Build the Library
+
+```sh
+git clone https://github.com/serg5z/dialog-layout.git
+cd dialog-layout
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
+
+This produces the static library in `build/`.
+
+---
+
+### 2. Add to Your Project with CMake
+
+\*\*A. Using \*\***`add_subdirectory()`**
+
+```cmake
+add_subdirectory(path/to/dialog-layout)
+target_link_libraries(yourapp PRIVATE dialog-layout::dialog-layout)
+```
+
+\*\*B. Using \*\***`FetchContent`**
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  dialog-layout
+  GIT_REPOSITORY https://github.com/serg5z/dialog-layout.git
+  GIT_TAG main
+)
+FetchContent_MakeAvailable(dialog-layout)
+
+target_link_libraries(yourapp PRIVATE dialog-layout::dialog-layout)
+```
+
+**C. Using ****`find_package()`**** (after install)**
+
+```cmake
+find_package(dialog-layout REQUIRED)
+target_link_libraries(yourapp PRIVATE dialog-layout::dialog-layout)
+```
+
+---
+
+### 3. Basic Usage Example
+
+In your code:
+
+```c
+#include "layout.h"
+attach_layout(GetModuleHandle(NULL), hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));
+```
+
+Add a matching `RCDATA` layout resource to your `.rc` file as shown in the documentation.
+
+---
+
+You’re ready to use dialog-layout! For more details and advanced usage, see the full documentation.
+
 ## License
 
 This software is distributable under the BSD license.
