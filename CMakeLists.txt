@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 project(dialog-layout VERSION 1.0.2 LANGUAGES C)
 
-set(CMAKE_C_CLANG_TIDY "clang-tidy")
+set(CMAKE_C_CLANG_TIDY "clang-tidy;--use-color")
 
 set(DIALOG_LAYOUT_SOURCES src/layout.c)
 set(DIALOG_LAYOUT_HEADERS include/layout.h)
