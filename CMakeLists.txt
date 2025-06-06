@@ -28,7 +28,7 @@ else()
 endif()
 
 # Update documentation
-find_package(Doxygen REQUIRED)
+find_package(Doxygen)
 if(DOXYGEN_FOUND)
     add_custom_target(doc
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
