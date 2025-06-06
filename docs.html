@@ -10,7 +10,8 @@ title: Documentation – dialog-layout
     <h1>Documentation</h1>
     <h2>API Reference</h2>
     <ul>
-      <li><a href="doxygen/latest/html/index.html">Latest (development)</a></li>
+      <li><a href="docs/api/latest/index.html">Latest (development)</a></li>
+      <li><a href="docs/api/v1.1.0/index.html">v1.1.0</a></li>
     </ul>
     <h2>Installation</h2>
     <ol>
@@ -35,8 +36,8 @@ detach_layout(hDlg); // in WM_DESTROY
       <pre>
 typedef struct {
   DWORD id;
-  DWORD top_left_anchor;
-  DWORD bottom_right_anchor;
+  WORD top_left_anchor;
+  WORD bottom_right_anchor;
 } LAYOUT_ITEM_RC;
       </pre>
     </p>
