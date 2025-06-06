@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(dialog-layout-example VERSION 1.0.0 LANGUAGES C)
 
+add_definitions(-DUNICODE -D_UNICODE)
+
 # Add the dialog-layout library as a subdirectory
 #add_subdirectory(dialog-layout)
 add_subdirectory(.. dialog-layout-build)

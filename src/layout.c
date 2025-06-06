@@ -9,19 +9,9 @@
 #include "layout.h"
 
 
-static const DWORD ANCOR_LEFT  =0x000001;
-static const DWORD ANCOR_TOP   =0x000002;
-static const DWORD ANCOR_RIGHT =0x000004;
-static const DWORD ANCOR_BOTTOM=0x000008;
-
 static const int LAYOUT_ATOM = 0x0b00;
 static const int DIALOG_PROCEDURE_ATOM = 0x0b01;
 
-typedef struct {
-  DWORD id;
-  DWORD top_left_anchor;
-  DWORD bottom_right_anchor;
-} LAYOUT_ITEM_RC;
 
 typedef struct {
   int x;
@@ -39,6 +29,117 @@ typedef struct LAYOUT_ITEM_LIST {
   LAYOUT_ITEM item;
   struct LAYOUT_ITEM_LIST* next;
 } LAYOUT_ITEM_LIST;
+
+/**
+ * @brief Structure representing a dialog layout.
+ *
+ * This structure holds information about the size of the dialog and the layout
+ * information for its controls. The details of the control layout array depend
+ * on the specific implementation and resource data.
+ */
+typedef struct {
+  int width;
+  int height;
+  int n_controls;
+  LAYOUT_ITEM_LIST* control_layout;
+} LAYOUT;
+
+typedef struct {
+  DWORD id;
+  WORD top_left_anchor;
+  WORD bottom_right_anchor;
+} LAYOUT_ITEM_RC;
+
+struct LAYOUT_CHILD_PARAM {
+  LAYOUT* layout;
+  LAYOUT_ITEM_RC* layout_table;
+  unsigned int n;
+  RECT dialog_rect;
+};
+
+static int
+is_legal_anchor(int anchor) {
+  return !(((anchor & ANCOR_TOP) && (anchor & ANCOR_BOTTOM)) ||
+           ((anchor & ANCOR_LEFT) && (anchor & ANCOR_RIGHT)));
+}
+
+static void
+layout(HWND dialog) {
+  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  
+  if(layout != 0) {
+    LAYOUT_ITEM_LIST* current = layout->control_layout;
+  
+    RECT dialog_rect;
+    HWND current_control;
+    
+    HDWP position_handle = BeginDeferWindowPos(layout->n_controls); /* store number of controls inside LAYOUT structure */
+    
+    GetClientRect(dialog, &dialog_rect);
+  
+    while(current != 0) {
+      RECT rect;
+      LAYOUT_ITEM* item = &(current->item);
+
+      if(is_legal_anchor(item->top_left.anchor) && is_legal_anchor(item->bottom_right.anchor)) {
+        int x;
+        int y;
+        int w;
+        int h;
+        
+        current_control = GetDlgItem(dialog, item->id);
+    
+        rect.left = item->top_left.x;
+        rect.top = item->top_left.y;
+        rect.right = item->bottom_right.x;
+        rect.bottom = item->bottom_right.y;
+          
+        if(item->top_left.anchor & ANCOR_RIGHT) {
+          rect.left += dialog_rect.right;
+        }
+    
+        if(item->top_left.anchor & ANCOR_LEFT) {
+          rect.left += dialog_rect.left;
+        }
+    
+        if(item->top_left.anchor & ANCOR_TOP) {
+          rect.top += dialog_rect.top;
+        }
+    
+        if(item->top_left.anchor & ANCOR_BOTTOM) {
+          rect.top += dialog_rect.bottom;
+        }
+    
+        if(item->bottom_right.anchor & ANCOR_RIGHT) {
+          rect.right += dialog_rect.right;
+        }
+    
+        if(item->bottom_right.anchor & ANCOR_LEFT) {
+          rect.right += dialog_rect.left;
+        }
+    
+        if(item->bottom_right.anchor & ANCOR_TOP) {
+          rect.bottom += dialog_rect.top;
+        }
+    
+        if(item->bottom_right.anchor & ANCOR_BOTTOM) {
+          rect.bottom += dialog_rect.bottom;
+        }
+    
+        w = rect.right-rect.left;
+        h = rect.bottom-rect.top;
+        x = rect.left;
+        y = rect.top;
+    
+        position_handle = DeferWindowPos(position_handle, current_control, 0, x, y, w, h, SWP_NOZORDER);
+      }
+      
+      current = current->next;
+    }
+    
+    EndDeferWindowPos(position_handle);
+  }
+}
 
 static LRESULT
 __layout_dialog_procedure__(HWND dialog, UINT message, WPARAM w_param, LPARAM l_param) {
@@ -72,13 +173,6 @@ __layout_dialog_procedure__(HWND dialog, UINT message, WPARAM w_param, LPARAM l_
   return result;
 }
 
-struct LAYOUT_CHILD_PARAM {
-  LAYOUT* layout;
-  LAYOUT_ITEM_RC* layout_table;
-  unsigned int n;
-  RECT dialog_rect;
-};
-
 static BOOL CALLBACK 
 layout_child(HWND control, LPARAM l_param) {
   struct LAYOUT_CHILD_PARAM* param = (struct LAYOUT_CHILD_PARAM*)l_param;
@@ -94,46 +188,48 @@ layout_child(HWND control, LPARAM l_param) {
   
   for(i = 0; i < param->n; i++) {
     if(param->layout_table[i].id == item_id) {
-      LAYOUT_ITEM_LIST* item = (LAYOUT_ITEM_LIST*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (sizeof(LAYOUT_ITEM_LIST)));
-      
-      item->item.id = item_id;
-      item->item.top_left.anchor = param->layout_table[i].top_left_anchor;
-      item->item.bottom_right.anchor = param->layout_table[i].bottom_right_anchor;
-      item->next = param->layout->control_layout;
+      if(is_legal_anchor(param->layout_table[i].top_left_anchor) && is_legal_anchor(param->layout_table[i].bottom_right_anchor)) {
+        LAYOUT_ITEM_LIST* item = (LAYOUT_ITEM_LIST*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, (sizeof(LAYOUT_ITEM_LIST)));
+        
+        item->item.id = item_id;
+        item->item.top_left.anchor = param->layout_table[i].top_left_anchor;
+        item->item.bottom_right.anchor = param->layout_table[i].bottom_right_anchor;
+        item->next = param->layout->control_layout;
 
-      if(item->item.top_left.anchor & ANCOR_RIGHT) {
-        item->item.top_left.x = control_rect.left - param->dialog_rect.left - dialog_width;
+        if(item->item.top_left.anchor & ANCOR_RIGHT) {
+          item->item.top_left.x = control_rect.left - param->dialog_rect.left - dialog_width;
+        }
+    
+        if(item->item.top_left.anchor & ANCOR_LEFT) {
+          item->item.top_left.x = control_rect.left - param->dialog_rect.left;
+        }
+    
+        if(item->item.top_left.anchor & ANCOR_TOP) {
+          item->item.top_left.y = control_rect.top - param->dialog_rect.top;
+        }
+    
+        if(item->item.top_left.anchor & ANCOR_BOTTOM) {
+          item->item.top_left.y = control_rect.top - param->dialog_rect.top - dialog_height;
+        }
+    
+        if(item->item.bottom_right.anchor & ANCOR_RIGHT) {
+          item->item.bottom_right.x = control_rect.right - param->dialog_rect.left - dialog_width;
+        }
+    
+        if(item->item.bottom_right.anchor & ANCOR_LEFT) {
+          item->item.bottom_right.x = control_rect.right - param->dialog_rect.left;
+        }
+    
+        if(item->item.bottom_right.anchor & ANCOR_TOP) {
+          item->item.bottom_right.y = control_rect.bottom - param->dialog_rect.top;
+        }
+    
+        if(item->item.bottom_right.anchor & ANCOR_BOTTOM) {
+          item->item.bottom_right.y = control_rect.bottom - param->dialog_rect.top - dialog_height;
+        }
+    
+        param->layout->control_layout = item;
       }
-  
-      if(item->item.top_left.anchor & ANCOR_LEFT) {
-        item->item.top_left.x = control_rect.left - param->dialog_rect.left;
-      }
-  
-      if(item->item.top_left.anchor & ANCOR_TOP) {
-        item->item.top_left.y = control_rect.top - param->dialog_rect.top;
-      }
-  
-      if(item->item.top_left.anchor & ANCOR_BOTTOM) {
-        item->item.top_left.y = control_rect.top - param->dialog_rect.top - dialog_height;
-      }
-  
-      if(item->item.bottom_right.anchor & ANCOR_RIGHT) {
-        item->item.bottom_right.x = control_rect.right - param->dialog_rect.left - dialog_width;
-      }
-  
-      if(item->item.bottom_right.anchor & ANCOR_LEFT) {
-        item->item.bottom_right.x = control_rect.right - param->dialog_rect.left;
-      }
-  
-      if(item->item.bottom_right.anchor & ANCOR_TOP) {
-        item->item.bottom_right.y = control_rect.bottom - param->dialog_rect.top;
-      }
-  
-      if(item->item.bottom_right.anchor & ANCOR_BOTTOM) {
-        item->item.bottom_right.y = control_rect.bottom - param->dialog_rect.top - dialog_height;
-      }
-  
-      param->layout->control_layout = item;
     }
   }
   
@@ -184,16 +280,133 @@ create_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
   return layout;
 }
 
-void 
-attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
+static void
+__attach_layout__(HWND dialog, LAYOUT* layout) {
   WNDPROC* original_procedure = (WNDPROC*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(WNDPROC));
-  LAYOUT* layout = create_layout(resource, dialog, layout_name);
   
   *original_procedure = (WNDPROC)SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)__layout_dialog_procedure__);
   
   SetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM), original_procedure);
   SetProp(dialog, MAKEINTATOM(LAYOUT_ATOM), layout);
 }
+
+void 
+attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
+  LAYOUT* layout = create_layout(resource, dialog, layout_name);
+
+  __attach_layout__(dialog, layout);
+}
+
+void
+init_layout(HWND dialog) {
+  LAYOUT* layout = (LAYOUT*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(LAYOUT));
+  RECT dialog_rect;
+
+  GetWindowRect(dialog, &dialog_rect);
+  layout->width = dialog_rect.right - dialog_rect.left;
+  layout->height = dialog_rect.bottom - dialog_rect.top;
+  layout->n_controls = 0;
+
+  __attach_layout__(dialog, layout);
+}
+
+BOOL 
+anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright) {
+  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  HWND control = GetDlgItem(dialog, control_id);
+  
+  if(!is_legal_anchor(anchor_topleft) || !is_legal_anchor(anchor_bottomright)) {
+    return FALSE;
+  }
+
+  if(layout != 0 && control != 0) {
+    LAYOUT_ITEM_LIST* current = layout->control_layout;
+    LAYOUT_ITEM* item = 0;
+    RECT control_rect;
+    RECT dialog_rect;
+    POINT p;
+    int dialog_width;
+    int dialog_height;
+
+    GetWindowRect(control, &control_rect);
+    GetClientRect(dialog, &dialog_rect);
+    p.x = dialog_rect.right;
+    p.y = dialog_rect.bottom;
+    ClientToScreen(dialog, &p);
+    dialog_rect.right = p.x;
+    dialog_rect.bottom = p.y;
+    p.x = 0;
+    p.y = 0;
+    ClientToScreen(dialog, &p);
+    dialog_rect.left = p.x;
+    dialog_rect.top = p.y;
+
+    dialog_width = dialog_rect.right - dialog_rect.left;
+    dialog_height = dialog_rect.bottom - dialog_rect.top;
+
+    while(current) {
+      item = &(current->item);
+
+      if(item->id == control_id) {
+        item->top_left.anchor = anchor_topleft;
+        item->bottom_right.anchor = anchor_bottomright;
+        break;
+      }
+
+      current = current->next;
+    }
+
+    if(current == 0) { 
+      LAYOUT_ITEM_LIST* layout_item_list = (LAYOUT_ITEM_LIST*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(LAYOUT_ITEM_LIST));
+      
+      layout_item_list->item.id = control_id;
+      layout_item_list->item.top_left.anchor = anchor_topleft;
+      layout_item_list->item.bottom_right.anchor = anchor_bottomright;
+      layout_item_list->next = layout->control_layout;
+
+      layout->n_controls++;
+      layout->control_layout = layout_item_list;
+      item = &(layout_item_list->item);
+    }
+
+    if(item->top_left.anchor & ANCOR_RIGHT) {
+      item->top_left.x = control_rect.left - dialog_rect.left - dialog_width;
+    }
+
+    if(item->top_left.anchor & ANCOR_LEFT) {
+      item->top_left.x = control_rect.left - dialog_rect.left;
+    }
+
+    if(item->top_left.anchor & ANCOR_TOP) {
+      item->top_left.y = control_rect.top - dialog_rect.top;
+    }
+
+    if(item->top_left.anchor & ANCOR_BOTTOM) {
+      item->top_left.y = control_rect.top - dialog_rect.top - dialog_height;
+    }
+
+    if(item->bottom_right.anchor & ANCOR_RIGHT) {
+      item->bottom_right.x = control_rect.right - dialog_rect.left - dialog_width;
+    }
+
+    if(item->bottom_right.anchor & ANCOR_LEFT) {
+      item->bottom_right.x = control_rect.right - dialog_rect.left;
+    }
+
+    if(item->bottom_right.anchor & ANCOR_TOP) {
+      item->bottom_right.y = control_rect.bottom - dialog_rect.top;
+    }
+
+    if(item->bottom_right.anchor & ANCOR_BOTTOM) {
+      item->bottom_right.y = control_rect.bottom - dialog_rect.top - dialog_height;
+    }
+
+    return TRUE;
+  } else {
+	return FALSE;
+  }
+}
+
 
 void
 detach_layout(HWND dialog) {
@@ -215,81 +428,4 @@ detach_layout(HWND dialog) {
     current = next;
   }
   HeapFree(GetProcessHeap(), 0, layout);
-}
-
-void
-layout(HWND dialog) {
-  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
-  
-  if(layout != 0) {
-    LAYOUT_ITEM_LIST* current =  (LAYOUT_ITEM_LIST*)(layout->control_layout);
-  
-    RECT dialog_rect;
-    HWND current_control;
-    
-    HDWP position_handle = BeginDeferWindowPos(layout->n_controls); /* store number of controls inside LAYOUT structure */
-    
-    GetClientRect(dialog, &dialog_rect);
-  
-    while(current != 0) {
-      RECT rect;
-      LAYOUT_ITEM* item = &(current->item);
-      int x;
-      int y;
-      int w;
-      int h;
-      
-      current_control = GetDlgItem(dialog, item->id);
-  
-      rect.left = item->top_left.x;
-      rect.top = item->top_left.y;
-      rect.right = item->bottom_right.x;
-      rect.bottom = item->bottom_right.y;
-      
-/*      MapDialogRect(dialog, &rect);*/
-  
-      if(item->top_left.anchor & ANCOR_RIGHT) {
-        rect.left += dialog_rect.right;
-      }
-  
-      if(item->top_left.anchor & ANCOR_LEFT) {
-        rect.left += dialog_rect.left;
-      }
-  
-      if(item->top_left.anchor & ANCOR_TOP) {
-        rect.top += dialog_rect.top;
-      }
-  
-      if(item->top_left.anchor & ANCOR_BOTTOM) {
-        rect.top += dialog_rect.bottom;
-      }
-  
-      if(item->bottom_right.anchor & ANCOR_RIGHT) {
-        rect.right += dialog_rect.right;
-      }
-  
-      if(item->bottom_right.anchor & ANCOR_LEFT) {
-        rect.right += dialog_rect.left;
-      }
-  
-      if(item->bottom_right.anchor & ANCOR_TOP) {
-        rect.bottom += dialog_rect.top;
-      }
-  
-      if(item->bottom_right.anchor & ANCOR_BOTTOM) {
-        rect.bottom += dialog_rect.bottom;
-      }
-  
-      w = rect.right-rect.left;
-      h = rect.bottom-rect.top;
-      x = rect.left;
-      y = rect.top;
-  
-      position_handle = DeferWindowPos(position_handle, current_control, 0, x, y, w, h, SWP_NOZORDER);
-      
-      current = current->next;
-    }
-    
-    EndDeferWindowPos(position_handle);
-  }
 }

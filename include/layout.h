@@ -6,6 +6,15 @@
  *
  */
 
+/**
+ * @file layout.h
+ * @brief Win32 dialog dynamic layout engine API.
+ *
+ * This header provides functions and macros for attaching, detaching, and managing
+ * dynamic layouts in Win32 dialog boxes. Controls in a dialog can be anchored to
+ * dialog edges to provide responsive resizing behavior.
+ */
+
 #ifndef LAYOUT_H
 #define LAYOUT_H
 
@@ -14,25 +23,34 @@
 
 
 /**
- * @brief Structure representing a dialog layout.
- *
- * This structure holds information about the size of the dialog and the layout
- * information for its controls. The details of the control layout array depend
- * on the specific implementation and resource data.
+ * @name Anchor flags
+ * @brief Anchor bitmasks used to define control layout behavior in a dialog.
+ * @{
  */
-typedef struct {
-  int width;
-  int height;
-  int n_controls;
-  void* control_layout;
-} LAYOUT;
+/** @brief Anchor control to the left edge. */
+#define ANCOR_LEFT          0x0001
+/** @brief Anchor control to the top edge. */
+#define ANCOR_TOP           0x0002
+/** @brief Anchor control to both left and top edges. */
+#define ANCOR_LEFT_TOP      (ANCOR_LEFT | ANCOR_TOP)
+/** @brief Anchor control to the right edge. */
+#define ANCOR_RIGHT         0x0004
+/** @brief Anchor control to both right and top edges. */
+#define ANCOR_RIGHT_TOP     (ANCOR_RIGHT | ANCOR_TOP)
+/** @brief Anchor control to the bottom edge. */
+#define ANCOR_BOTTOM        0x0008
+/** @brief Anchor control to both left and bottom edges. */
+#define ANCOR_LEFT_BOTTOM   (ANCOR_LEFT | ANCOR_BOTTOM)
+/** @brief Anchor control to both right and bottom edges. */
+#define ANCOR_RIGHT_BOTTOM  (ANCOR_RIGHT | ANCOR_BOTTOM)
+/** @} */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Attaches a layout to a dialog box from a layout resource.
+ * @brief Attach a dynamic layout to a dialog box using a layout resource.
  *
  * Loads the layout information from the specified resource and applies it
  * to the dialog, so its controls will resize and move according to the layout
@@ -40,9 +58,20 @@ extern "C" {
  *
  * @param resource             Handle to the module containing the resource.
  * @param dialog               Handle to the dialog box (HWND).
- * @param layout_resource_name Name of the layout resource (e.g., TEXT("ID_MAINDIALOG_LAYOUT")).
+ * @param layout_resource_name Name of the layout resource (e.g., MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT)).
+ * 
+ * @note
+ * Call this function in WM_INITDIALOG after creating the dialog.
+ *
+ * Example usage:
+ * @code
+ * attach_layout(hInstance, hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));
+ * @endcode
  */
 void attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_resource_name);
+
+void init_layout(HWND dialog);
+BOOL anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright);
 
 /**
  * @brief Detaches the layout from the dialog, disabling automatic control layout management.
@@ -51,18 +80,11 @@ void attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_resource_name);
  * repositioned when the dialog is resized.
  *
  * @param dialog  Handle to the dialog box (HWND).
+ * 
+ * @note
+ * Call this function before destroying the dialog to clean up any resources.
  */
 void detach_layout(HWND dialog);
-
-/**
- * @brief Applies the layout rules to the dialog immediately.
- *
- * Forces an immediate re-layout of the dialog controls according to the current layout.
- * Can be used to refresh layout after manual resizing or other changes.
- *
- * @param dialog  Handle to the dialog box (HWND).
- */
-void layout(HWND dialog);
 
 #ifdef __cplusplus
 }
