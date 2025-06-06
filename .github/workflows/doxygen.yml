@@ -2,7 +2,6 @@ name: Publish Doxygen Docs (versioned and latest)
 
 on:
   push:
-    branches: [master, main]
     tags:
       - '*'       # Any tag
 

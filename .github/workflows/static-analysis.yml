@@ -18,9 +18,10 @@ jobs:
         run: |
           choco install -y llvm cppcheck
 
-      - name: Add LLVM to PATH
+      - name: Add LLVM and cppcheck to PATH
         run: |
           echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure CMake
         run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
