@@ -142,12 +142,11 @@ Functions</h2></td></tr>
 <tr class="memdesc:a026d53306dfc2bde641d4588d54c003a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a dynamic layout to a dialog box using a layout resource.  <br /></td></tr>
 <tr class="separator:a026d53306dfc2bde641d4588d54c003a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8caf9bd32dee982fe4d5bf6e9657e294" id="r_a8caf9bd32dee982fe4d5bf6e9657e294"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="layout_8c.html#a8caf9bd32dee982fe4d5bf6e9657e294">init_layout</a> (HWND dialog)</td></tr>
+<tr class="memdesc:a8caf9bd32dee982fe4d5bf6e9657e294"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize dynamic layout management for a dialog.  <br /></td></tr>
 <tr class="separator:a8caf9bd32dee982fe4d5bf6e9657e294"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7962b825ebd49ea0f557708fd6df7c2d" id="r_a7962b825ebd49ea0f557708fd6df7c2d"><td class="memItemLeft" align="right" valign="top">BOOL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="layout_8c.html#a7962b825ebd49ea0f557708fd6df7c2d">anchor_control</a> (HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright)</td></tr>
+<tr class="memdesc:a7962b825ebd49ea0f557708fd6df7c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Anchor an individual control to specific edges of the dialog, overriding any previous anchor.  <br /></td></tr>
 <tr class="separator:a7962b825ebd49ea0f557708fd6df7c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fe6dbbf9cadf6353d7e35c47451d26d" id="r_a9fe6dbbf9cadf6353d7e35c47451d26d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="layout_8c.html#a9fe6dbbf9cadf6353d7e35c47451d26d">detach_layout</a> (HWND dialog)</td></tr>
-<tr class="memdesc:a9fe6dbbf9cadf6353d7e35c47451d26d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detaches the layout from the dialog, disabling automatic control layout management.  <br /></td></tr>
-<tr class="separator:a9fe6dbbf9cadf6353d7e35c47451d26d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a42b85fd4a777b25fab66ab1e319148e4" name="a42b85fd4a777b25fab66ab1e319148e4"></a>
@@ -203,6 +202,26 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Anchor an individual control to specific edges of the dialog, overriding any previous anchor. </p>
+<p>Registers or overrides the anchor points for the specified control in the layout engine. This function can be used after <a class="el" href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a" title="Attach a dynamic layout to a dialog box using a layout resource.">attach_layout()</a> to override anchors loaded from a resource, or after <a class="el" href="layout_8h.html#a8caf9bd32dee982fe4d5bf6e9657e294" title="Initialize dynamic layout management for a dialog.">init_layout()</a> to add anchors manually.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dialog</td><td>Handle to the dialog box (HWND). </td></tr>
+    <tr><td class="paramname">control_id</td><td>Control ID (e.g., IDC_BUTTON_OK). </td></tr>
+    <tr><td class="paramname">anchor_topleft</td><td>Anchor flags for the control's top-left corner (see Anchor flags). </td></tr>
+    <tr><td class="paramname">anchor_bottomright</td><td>Anchor flags for the control's bottom-right corner (see Anchor flags). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE if the anchor was set successfully, FALSE on error (e.g., illegal anchor or control not found).</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>It is safe to use <a class="el" href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d" title="Anchor an individual control to specific edges of the dialog, overriding any previous anchor.">anchor_control()</a> after <a class="el" href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a" title="Attach a dynamic layout to a dialog box using a layout resource.">attach_layout()</a> to override anchors set by the resource, or to add anchors for additional controls at runtime.</dd></dl>
+<p>Example usage: </p><div class="fragment"><div class="line"><a class="code hl_function" href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a">attach_layout</a>(hInstance, hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));</div>
+<div class="line"><a class="code hl_function" href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d">anchor_control</a>(hDlg, IDC_MY_BUTTON, <a class="code hl_define" href="layout_8h.html#a34ab0235bc8a8a9b719a8cf2305408a4">ANCOR_RIGHT</a> | <a class="code hl_define" href="layout_8h.html#acb012370aba13e9637437bca02c84075">ANCOR_BOTTOM</a>, <a class="code hl_define" href="layout_8h.html#a34ab0235bc8a8a9b719a8cf2305408a4">ANCOR_RIGHT</a> | <a class="code hl_define" href="layout_8h.html#acb012370aba13e9637437bca02c84075">ANCOR_BOTTOM</a>); <span class="comment">// override/add anchor</span></div>
+<div class="ttc" id="alayout_8h_html_a236b49201b67914604eb4973c6fbf23a"><div class="ttname"><a href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a">attach_layout</a></div><div class="ttdeci">void attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_resource_name)</div><div class="ttdoc">Attach a dynamic layout to a dialog box using a layout resource.</div><div class="ttdef"><b>Definition</b> layout.c:361</div></div>
+<div class="ttc" id="alayout_8h_html_a34ab0235bc8a8a9b719a8cf2305408a4"><div class="ttname"><a href="layout_8h.html#a34ab0235bc8a8a9b719a8cf2305408a4">ANCOR_RIGHT</a></div><div class="ttdeci">#define ANCOR_RIGHT</div><div class="ttdoc">Anchor control to the right edge.</div><div class="ttdef"><b>Definition</b> layout.h:37</div></div>
+<div class="ttc" id="alayout_8h_html_a7962b825ebd49ea0f557708fd6df7c2d"><div class="ttname"><a href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d">anchor_control</a></div><div class="ttdeci">BOOL anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright)</div><div class="ttdoc">Anchor an individual control to specific edges of the dialog, overriding any previous anchor.</div><div class="ttdef"><b>Definition</b> layout.c:381</div></div>
+<div class="ttc" id="alayout_8h_html_acb012370aba13e9637437bca02c84075"><div class="ttname"><a href="layout_8h.html#acb012370aba13e9637437bca02c84075">ANCOR_BOTTOM</a></div><div class="ttdeci">#define ANCOR_BOTTOM</div><div class="ttdoc">Anchor control to the bottom edge.</div><div class="ttdef"><b>Definition</b> layout.h:41</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a026d53306dfc2bde641d4588d54c003a" name="a026d53306dfc2bde641d4588d54c003a"></a>
@@ -249,36 +268,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Call this function in WM_INITDIALOG after creating the dialog.</dd></dl>
 <p>Example usage: </p><div class="fragment"><div class="line"><a class="code hl_function" href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a">attach_layout</a>(hInstance, hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));</div>
-<div class="ttc" id="alayout_8h_html_a236b49201b67914604eb4973c6fbf23a"><div class="ttname"><a href="layout_8h.html#a236b49201b67914604eb4973c6fbf23a">attach_layout</a></div><div class="ttdeci">void attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_resource_name)</div><div class="ttdoc">Attach a dynamic layout to a dialog box using a layout resource.</div><div class="ttdef"><b>Definition</b> layout.c:294</div></div>
 </div><!-- fragment --> 
-</div>
-</div>
-<a id="a9fe6dbbf9cadf6353d7e35c47451d26d" name="a9fe6dbbf9cadf6353d7e35c47451d26d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fe6dbbf9cadf6353d7e35c47451d26d">&#9670;&#160;</a></span>detach_layout()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void detach_layout </td>
-          <td>(</td>
-          <td class="paramtype">HWND&#160;</td>
-          <td class="paramname"><em>dialog</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Detaches the layout from the dialog, disabling automatic control layout management. </p>
-<p>After calling this function, controls will no longer be automatically resized or repositioned when the dialog is resized.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">dialog</td><td>Handle to the dialog box (HWND).</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Call this function before destroying the dialog to clean up any resources. </dd></dl>
-
 </div>
 </div>
 <a id="a8caf9bd32dee982fe4d5bf6e9657e294" name="a8caf9bd32dee982fe4d5bf6e9657e294"></a>
@@ -297,6 +287,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialize dynamic layout management for a dialog. </p>
+<p>Prepares the dialog for dynamic layout by creating an internal layout structure. Controls can then be anchored individually using <a class="el" href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d" title="Anchor an individual control to specific edges of the dialog, overriding any previous anchor.">anchor_control()</a>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dialog</td><td>Handle to the dialog box (HWND).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Call this function in WM_INITDIALOG if you are not using a layout resource table, and plan to manually anchor controls using <a class="el" href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d" title="Anchor an individual control to specific edges of the dialog, overriding any previous anchor.">anchor_control()</a>.</dd></dl>
+<p>Example usage: </p><div class="fragment"><div class="line"><a class="code hl_function" href="layout_8h.html#a8caf9bd32dee982fe4d5bf6e9657e294">init_layout</a>(hDlg);</div>
+<div class="line"><a class="code hl_function" href="layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d">anchor_control</a>(hDlg, IDC_BUTTON_OK, <a class="code hl_define" href="layout_8h.html#a34ab0235bc8a8a9b719a8cf2305408a4">ANCOR_RIGHT</a> | <a class="code hl_define" href="layout_8h.html#acb012370aba13e9637437bca02c84075">ANCOR_BOTTOM</a>, <a class="code hl_define" href="layout_8h.html#a34ab0235bc8a8a9b719a8cf2305408a4">ANCOR_RIGHT</a> | <a class="code hl_define" href="layout_8h.html#acb012370aba13e9637437bca02c84075">ANCOR_BOTTOM</a>);</div>
+<div class="ttc" id="alayout_8h_html_a8caf9bd32dee982fe4d5bf6e9657e294"><div class="ttname"><a href="layout_8h.html#a8caf9bd32dee982fe4d5bf6e9657e294">init_layout</a></div><div class="ttdeci">void init_layout(HWND dialog)</div><div class="ttdoc">Initialize dynamic layout management for a dialog.</div><div class="ttdef"><b>Definition</b> layout.c:368</div></div>
+</div><!-- fragment --> 
 </div>
 </div>
 </div><!-- contents -->

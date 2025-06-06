@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['anchor_0',['anchor',['../structLAYOUT__COORD.html#a386bc1f5df7178e868ac7698d5b16ab2',1,'LAYOUT_COORD']]],
+  ['anchor_0',['anchor',['../structLAYOUT__COORD.html#a9af8663cf1363c4682b802f55762e2d8',1,'LAYOUT_COORD']]],
   ['anchor_5fcontrol_1',['anchor_control',['../layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d',1,'anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright):&#160;layout.c'],['../layout_8c.html#a7962b825ebd49ea0f557708fd6df7c2d',1,'anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright):&#160;layout.c']]],
   ['ancor_5fbottom_2',['ANCOR_BOTTOM',['../layout_8h.html#acb012370aba13e9637437bca02c84075',1,'layout.h']]],
   ['ancor_5fleft_3',['ANCOR_LEFT',['../layout_8h.html#a604cdf0d68c1b1fc08a8d794d0a1941a',1,'layout.h']]],

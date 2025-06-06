@@ -10,6 +10,5 @@ var layout_8h =
     [ "ANCOR_TOP", "layout_8h.html#a03401ebc55aceb97693a9c55c99b36c4", null ],
     [ "anchor_control", "layout_8h.html#a7962b825ebd49ea0f557708fd6df7c2d", null ],
     [ "attach_layout", "layout_8h.html#a236b49201b67914604eb4973c6fbf23a", null ],
-    [ "detach_layout", "layout_8h.html#a9fe6dbbf9cadf6353d7e35c47451d26d", null ],
     [ "init_layout", "layout_8h.html#a8caf9bd32dee982fe4d5bf6e9657e294", null ]
 ];
