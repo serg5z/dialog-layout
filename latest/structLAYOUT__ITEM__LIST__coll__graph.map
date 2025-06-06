@@ -1,8 +1,0 @@
-<map id="LAYOUT_ITEM_LIST" name="LAYOUT_ITEM_LIST">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,196,152,221"/>
-<area shape="poly" id="edge3_Node000001_Node000001" title=" " alt="" coords="167,200,179,208,170,216,152,219,152,214,168,211,173,209,164,205"/>
-<area shape="rect" id="Node000002" href="$structLAYOUT__ITEM.html" title=" " alt="" coords="23,108,135,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="81,147,81,195,76,195,76,147"/>
-<area shape="rect" id="Node000003" href="$structLAYOUT__COORD.html" title=" " alt="" coords="15,5,143,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="81,45,81,108,76,108,76,45"/>
-</map>
