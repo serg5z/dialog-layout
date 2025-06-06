@@ -70,21 +70,50 @@ extern "C" {
  */
 void attach_layout(HANDLE resource, HWND dialog, LPCTSTR layout_resource_name);
 
+/**
+ * @brief Initialize dynamic layout management for a dialog.
+ *
+ * Prepares the dialog for dynamic layout by creating an internal layout structure.
+ * Controls can then be anchored individually using anchor_control().
+ * 
+ * @param dialog  Handle to the dialog box (HWND).
+ *
+ * @note
+ * Call this function in WM_INITDIALOG if you are not using a layout resource table,
+ * and plan to manually anchor controls using anchor_control().
+ *
+ * Example usage:
+ * @code
+ * init_layout(hDlg);
+ * anchor_control(hDlg, IDC_BUTTON_OK, ANCOR_RIGHT | ANCOR_BOTTOM, ANCOR_RIGHT | ANCOR_BOTTOM);
+ * @endcode
+ */
 void init_layout(HWND dialog);
-BOOL anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright);
 
 /**
- * @brief Detaches the layout from the dialog, disabling automatic control layout management.
+ * @brief Anchor an individual control to specific edges of the dialog, overriding any previous anchor.
  *
- * After calling this function, controls will no longer be automatically resized or
- * repositioned when the dialog is resized.
+ * Registers or overrides the anchor points for the specified control in the layout engine.
+ * This function can be used after attach_layout() to override anchors loaded from a resource,
+ * or after init_layout() to add anchors manually.
  *
- * @param dialog  Handle to the dialog box (HWND).
- * 
+ * @param dialog           Handle to the dialog box (HWND).
+ * @param control_id       Control ID (e.g., IDC_BUTTON_OK).
+ * @param anchor_topleft   Anchor flags for the control's top-left corner (see @ref Anchor flags).
+ * @param anchor_bottomright Anchor flags for the control's bottom-right corner (see @ref Anchor flags).
+ * @return                 TRUE if the anchor was set successfully, FALSE on error (e.g., illegal anchor or control not found).
+ *
  * @note
- * Call this function before destroying the dialog to clean up any resources.
+ * It is safe to use anchor_control() after attach_layout() to override anchors set by the resource,
+ * or to add anchors for additional controls at runtime.
+ *
+ * Example usage:
+ * @code
+ * attach_layout(hInstance, hDlg, MAKEINTRESOURCE(ID_MAINDIALOG_LAYOUT));
+ * anchor_control(hDlg, IDC_MY_BUTTON, ANCOR_RIGHT | ANCOR_BOTTOM, ANCOR_RIGHT | ANCOR_BOTTOM); // override/add anchor
+ * @endcode
  */
-void detach_layout(HWND dialog);
+BOOL anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_bottomright);
 
 #ifdef __cplusplus
 }

@@ -57,6 +57,8 @@ struct LAYOUT_CHILD_PARAM {
   RECT dialog_rect;
 };
 
+static void __detach_layout__(HWND dialog);
+
 static int
 is_legal_anchor(int anchor) {
   return !(((anchor & ANCOR_TOP) && (anchor & ANCOR_BOTTOM)) ||
@@ -165,6 +167,8 @@ __layout_dialog_procedure__(HWND dialog, UINT message, WPARAM w_param, LPARAM l_
   } else {
     if(message == WM_SIZE) {
       __layout__(dialog);
+    } else if(message == WM_DESTROY) {
+      __detach_layout__(dialog);
     }
     
     result = CallWindowProc(original_procedure, dialog, message, w_param, l_param);
@@ -262,7 +266,7 @@ __layout_child__(HWND control, LPARAM l_param) {
 }
 
 static void
-__cllient_to_screen__(HWND dialog, RECT* out_rect) {
+__client_to_screen__(HWND dialog, RECT* out_rect) {
   RECT client;
   POINT p;
 
@@ -305,7 +309,7 @@ __create_layout__(HANDLE resource, HWND dialog, LPCTSTR layout_name) {
   l_param.layout = layout;
   l_param.layout_table = layout_table;
   l_param.n = layout_resource_size/sizeof(LAYOUT_ITEM_RC);
-  __cllient_to_screen__(dialog, &l_param.dialog_rect);
+  __client_to_screen__(dialog, &l_param.dialog_rect);
   GetWindowRect(dialog, &dialog_rect);
   layout->width = dialog_rect.right - dialog_rect.left;
   layout->height = dialog_rect.bottom - dialog_rect.top;
@@ -326,6 +330,31 @@ __attach_layout__(HWND dialog, LAYOUT* layout) {
   
   SetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM), original_procedure);
   SetProp(dialog, MAKEINTATOM(LAYOUT_ATOM), layout);
+}
+
+static void
+__detach_layout__(HWND dialog) {
+  WNDPROC* original_procedure = (WNDPROC*)GetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
+  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  LAYOUT_ITEM_LIST* current;
+  LAYOUT_ITEM_LIST* next;
+  
+  SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)(*original_procedure));
+  
+  RemoveProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
+  RemoveProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
+  
+  HeapFree(GetProcessHeap(), 0, original_procedure);
+
+  current = (LAYOUT_ITEM_LIST*)(layout->control_layout);
+
+  while(current != 0) {
+    next = current->next;
+    HeapFree(GetProcessHeap(), 0, current);
+    current = next;
+  }
+
+  HeapFree(GetProcessHeap(), 0, layout);
 }
 
 void 
@@ -364,7 +393,7 @@ anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_b
     RECT dialog_rect;
 
     GetWindowRect(control, &control_rect);
-    __cllient_to_screen__(dialog, &dialog_rect);
+    __client_to_screen__(dialog, &dialog_rect);
 
     while(current) {
       item = &(current->item);
@@ -407,29 +436,4 @@ anchor_control(HWND dialog, DWORD control_id, WORD anchor_topleft, WORD anchor_b
   } else {
 	  return FALSE;
   }
-}
-
-void
-detach_layout(HWND dialog) {
-  WNDPROC* original_procedure = (WNDPROC*)GetProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
-  LAYOUT* layout = (LAYOUT*)GetProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
-  LAYOUT_ITEM_LIST* current;
-  LAYOUT_ITEM_LIST* next;
-  
-  SetWindowLongPtr(dialog, GWLP_WNDPROC, (LONG_PTR)(*original_procedure));
-  
-  RemoveProp(dialog, MAKEINTATOM(DIALOG_PROCEDURE_ATOM));
-  RemoveProp(dialog, MAKEINTATOM(LAYOUT_ATOM));
-  
-  HeapFree(GetProcessHeap(), 0, original_procedure);
-
-  current = (LAYOUT_ITEM_LIST*)(layout->control_layout);
-
-  while(current != 0) {
-    next = current->next;
-    HeapFree(GetProcessHeap(), 0, current);
-    current = next;
-  }
-
-  HeapFree(GetProcessHeap(), 0, layout);
 }
