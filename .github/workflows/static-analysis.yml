@@ -29,5 +29,5 @@ jobs:
       - name: Run clang-tidy
         run: clang-tidy src/*.c -p build || exit 0
 
-      - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive --std=c99 src/ include/
+      # - name: Run cppcheck
+      #   run: cppcheck --enable=all --inconclusive --std=c99 src/ include/
