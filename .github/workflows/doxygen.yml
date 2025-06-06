@@ -19,22 +19,13 @@ jobs:
       - name: Generate Doxygen documentation
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            PROJECT_NUMBER="${GITHUB_REF##*/}"
+            export PROJECT_NUMBER="${GITHUB_REF##*/}"
           else
-            PROJECT_NUMBER="latest"
+            export PROJECT_NUMBER="latest"
           fi
-          doxygen -D PROJECT_NUMBER="$PROJECT_NUMBER" Doxyfile
+          sed "s|@PROJECT_NUMBER@|$PROJECT_NUMBER|g" Doxyfile.in > Doxyfile
+          doxygen Doxyfile
   
-      - name: Generate index.html with version links
-        run: |
-          mkdir -p docs
-          echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>dialog-layout Documentation</title></head><body><h1>dialog-layout Documentation</h1><ul>' > docs/index.html
-          for dir in $(find docs -mindepth 1 -maxdepth 1 -type d); do
-            d=$(basename "$dir")
-            echo "<li><a href=\"$d/\">$d</a></li>" >> docs/index.html
-          done
-          echo '</ul></body></html>' >> docs/index.html
-
       # Determine if this is a tag or branch build
       - name: Set destination_dir
         id: destdir
@@ -49,6 +40,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs/api
           destination_dir: ${{ steps.destdir.outputs.dir }}
           keep_files: true
