@@ -17,8 +17,14 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
       - name: Generate Doxygen documentation
-        run: doxygen Doxyfile
-
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            PROJECT_NUMBER="${GITHUB_REF##*/}"
+          else
+            PROJECT_NUMBER="latest"
+          fi
+          doxygen -D PROJECT_NUMBER="$PROJECT_NUMBER" Doxyfile
+  
       - name: Generate index.html with version links
         run: |
           mkdir -p docs
