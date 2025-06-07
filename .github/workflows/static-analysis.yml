@@ -35,7 +35,7 @@ jobs:
 
       - name: List cppcheck installation
         run: Get-ChildItem -Path "C:\Program Files\Cppcheck" -Recurse
-        
+
       - name: Run cppcheck
         run: |
           $cmds = Get-Content build/compile_commands.json -Raw | ConvertFrom-Json
@@ -50,6 +50,11 @@ jobs:
           $cppcheckIncludes = $includes -join " "
           Write-Output "Cppcheck will use: $cppcheckIncludes"
           cppcheck --enable=all --inconclusive --xml --xml-version=2 --std=c99 $cppcheckIncludes src/ include/ 2> cppcheck-results.xml
+
+      - name: Download cppcheck-htmlreport
+        run: |
+          curl -L -o cppcheck-htmlreport https://raw.githubusercontent.com/danmar/cppcheck/main/htmlreport/cppcheck-htmlreport
+          curl -L -o - https://github.com/danmar/cppcheck/archive/refs/heads/main.zip | tar -x -C .  # Or manually fetch templates
 
       - name: Generate HTML report
         run: |
