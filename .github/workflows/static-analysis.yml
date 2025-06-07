@@ -1,7 +1,6 @@
 name: Static Analysis
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
@@ -17,13 +16,15 @@ jobs:
 
       - name: Install dependencies (clang-tidy & cppcheck)
         run: |
-          choco install -y llvm cppcheck python
+          choco install -y cppcheck
+
+      - name: Install Python dependencies
+        run: pip install lxml jinja2 pygments
 
       - name: Add LLVM and cppcheck to PATH
         run: |
-          echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\Python310\Scripts" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure CMake
         run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -44,14 +45,22 @@ jobs:
           $includes = $includes | Sort-Object -Unique
           $cppcheckIncludes = $includes -join " "
           Write-Output "Cppcheck will use: $cppcheckIncludes"
-          & cppcheck --enable=all --inconclusive --xml --xml-version=2 --std=c99 $cppcheckIncludes src/ include/ 2> cppcheck-results.xml
+          cppcheck --enable=all --inconclusive --check-level=exhaustive --xml --xml-version=2 `
+            --std=c99 $cppcheckIncludes src/ include/ `
+            2> cppcheck-results.xml
+
+      - name: Download cppcheck-htmlreport
+        run: |
+          curl -L -o cppcheck-htmlreport https://raw.githubusercontent.com/danmar/cppcheck/main/htmlreport/cppcheck-htmlreport
+          curl -L -o cppcheck-main.zip https://github.com/danmar/cppcheck/archive/refs/heads/main.zip
+          Expand-Archive -Path cppcheck-main.zip -DestinationPath .
 
       - name: Generate HTML report
         run: |
-          python "C:\Program Files\Cppcheck\htmlreport\cppcheck-htmlreport" ^
-            --file=cppcheck-results.xml ^
-            --report-dir=cppcheck-html ^
-            --source-dir=.
+          python cppcheck-main/htmlreport/cppcheck-htmlreport `
+            --file=cppcheck-results.xml `
+            --report-dir=cppcheck-html `
+            --source-dir=. 
 
       - name: Upload HTML cppcheck report
         uses: actions/upload-artifact@v4
