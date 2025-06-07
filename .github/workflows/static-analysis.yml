@@ -27,8 +27,8 @@ jobs:
           # echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      # - name: Configure CMake
-      #   run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Configure CMake
+        run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       # - name: Run clang-tidy
       #   run: clang-tidy src/*.c -p build || exit 0
