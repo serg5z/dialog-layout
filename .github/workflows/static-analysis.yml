@@ -30,8 +30,8 @@ jobs:
       - name: Configure CMake
         run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      # - name: Run clang-tidy
-      #   run: clang-tidy src/*.c -p build || exit 0
+      - name: Run clang-tidy
+        run: clang-tidy src/*.c -p build || exit 0
 
       - name: Run cppcheck
         run: |
@@ -46,7 +46,7 @@ jobs:
           $includes = $includes | Sort-Object -Unique
           $cppcheckIncludes = $includes -join " "
           Write-Output "Cppcheck will use: $cppcheckIncludes"
-          cppcheck --enable=all --inconclusive --xml --xml-version=2 --std=c99 $cppcheckIncludes src/ include/ 2> cppcheck-results.xml
+          cppcheck --enable=all --inconclusive --check-level=exhaustive --xml --xml-version=2 --std=c99 $cppcheckIncludes src/ include/ 2> cppcheck-results.xml
 
       - name: Download cppcheck-htmlreport
         run: |
