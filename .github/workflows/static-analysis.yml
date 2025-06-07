@@ -1,7 +1,6 @@
 name: Static Analysis
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
@@ -48,7 +47,6 @@ jobs:
           Write-Output "Cppcheck will use: $cppcheckIncludes"
           cppcheck --enable=all --inconclusive --check-level=exhaustive --xml --xml-version=2 `
             --std=c99 $cppcheckIncludes src/ include/ `
-            --checkers-report=cppcheck-checkers.txt `
             2> cppcheck-results.xml
 
       - name: Download cppcheck-htmlreport
@@ -69,9 +67,3 @@ jobs:
         with:
           name: cppcheck-html-report
           path: cppcheck-html
-
-      - name: Upload cppcheck checkers report
-        uses: actions/upload-artifact@v4
-        with:
-          name: cppcheck-checkers
-          path: cppcheck-checkers.txt
