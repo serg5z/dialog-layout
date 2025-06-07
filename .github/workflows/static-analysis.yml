@@ -21,33 +21,7 @@ jobs:
       - name: Add LLVM and cppcheck to PATH
         run: |
           echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Find cppcheck
-        run: |
-          if (!(Get-Command cppcheck.exe -ErrorAction SilentlyContinue)) {
-            Write-Host "cppcheck not in PATH, searching..."
-            $cppcheckPath = Get-ChildItem -Path 'C:\ProgramData\chocolatey\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-            if ($cppcheckPath) {
-              Write-Host "Found cppcheck at $cppcheckPath"
-              echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            } else {
-              $cppcheckPath = Get-ChildItem -Path 'C:\Program Files\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-              if ($cppcheckPath) {
-                Write-Host "Found cppcheck at $cppcheckPath"
-                echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-              } else {
-                $cppcheckPath = Get-ChildItem -Path 'C:\Program Files (x86)\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-                if ($cppcheckPath) {
-                  Write-Host "Found cppcheck at $cppcheckPath"
-                  echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-                } else {
-                  Write-Error "cppcheck.exe not found!"
-                  exit 1
-                }
-              }
-            }
-          }
+          echo "C:\Program Files\Cppcheck" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Configure CMake
         run: cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -55,5 +29,5 @@ jobs:
       - name: Run clang-tidy
         run: clang-tidy src/*.c -p build || exit 0
 
-      # - name: Run cppcheck
-      #   run: cppcheck --enable=all --inconclusive --std=c99 src/ include/
+      - name: Run cppcheck
+        run: cppcheck --enable=all --inconclusive --std=c99 src/ include/
