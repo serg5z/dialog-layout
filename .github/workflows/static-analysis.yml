@@ -59,8 +59,7 @@ jobs:
           python cppcheck-main/htmlreport/cppcheck-htmlreport `
             --file=cppcheck-results.xml `
             --report-dir=cppcheck-html `
-            --source-dir=. `
-            --template-dir=cppcheck-main/htmlreport/templates
+            --source-dir=. 
 
       - name: Upload HTML cppcheck report
         uses: actions/upload-artifact@v4
