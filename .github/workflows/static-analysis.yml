@@ -56,10 +56,11 @@ jobs:
 
       - name: Generate HTML report
         run: |
-          python "C:\Program Files\Cppcheck\tools\cppcheck-htmlreport" `
+          python cppcheck-main/htmlreport/cppcheck-htmlreport `
             --file=cppcheck-results.xml `
             --report-dir=cppcheck-html `
-            --source-dir=.
+            --source-dir=. `
+            --template-dir=cppcheck-main/htmlreport/templates
 
       - name: Upload HTML cppcheck report
         uses: actions/upload-artifact@v4
