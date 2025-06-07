@@ -32,24 +32,20 @@ jobs:
               Write-Host "Found cppcheck at $cppcheckPath"
               echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
             } else {
-              Write-Error "cppcheck.exe not found!"
-              exit 1
-            }
-            $cppcheckPath = Get-ChildItem -Path 'C:\Program Files\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-            if ($cppcheckPath) {
-              Write-Host "Found cppcheck at $cppcheckPath"
-              echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            } else {
-              Write-Error "cppcheck.exe not found!"
-              exit 1
-            }
-            $cppcheckPath = Get-ChildItem -Path 'C:\Program Files (x86)\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-            if ($cppcheckPath) {
-              Write-Host "Found cppcheck at $cppcheckPath"
-              echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-            } else {
-              Write-Error "cppcheck.exe not found!"
-              exit 1
+              $cppcheckPath = Get-ChildItem -Path 'C:\Program Files\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+              if ($cppcheckPath) {
+                Write-Host "Found cppcheck at $cppcheckPath"
+                echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+              } else {
+                $cppcheckPath = Get-ChildItem -Path 'C:\Program Files (x86)\' -Filter cppcheck.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+                if ($cppcheckPath) {
+                  Write-Host "Found cppcheck at $cppcheckPath"
+                  echo "$(Split-Path $cppcheckPath)" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+                } else {
+                  Write-Error "cppcheck.exe not found!"
+                  exit 1
+                }
+              }
             }
           }
 
