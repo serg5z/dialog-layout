@@ -30,4 +30,16 @@ jobs:
         run: clang-tidy src/*.c -p build || exit 0
 
       - name: Run cppcheck
-        run: cppcheck --enable=all --inconclusive --std=c99 src/ include/
+        run: |
+          $cmds = Get-Content build/compile_commands.json -Raw | ConvertFrom-Json
+          $includes = @()
+          foreach ($cmd in $cmds) {
+              if ($cmd.command) {
+                  $inc = ($cmd.command -split " ") | Where-Object { $_ -like "-I*" }
+                  $includes += $inc
+              }
+          }
+          $includes = $includes | Sort-Object -Unique
+          $cppcheckIncludes = $includes -join " "
+          Write-Output "Cppcheck will use: $cppcheckIncludes"
+          cppcheck --enable=all --inconclusive --std=c99 $cppcheckIncludes src/ include/
